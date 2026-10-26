@@ -1,0 +1,155 @@
+zabbix_export:
+  version: '6.0'
+  date: '2026-10-23T12:00:00Z'
+  media_types:
+    -
+      name: 'NOC Teams'
+      type: WEBHOOK
+      parameters:
+        -
+          name: event_id
+          value: '{EVENT.ID}'
+        -
+          name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        -
+          name: event_value
+          value: '{EVENT.VALUE}'
+        -
+          name: http_proxy
+        -
+          name: message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: teams_endpoint
+          value: 'COLE_AQUI_A_URL_DO_WEBHOOK'
+        -
+          name: trigger_id
+          value: '{TRIGGER.ID}'
+        -
+          name: zabbix_url
+          value: 'COLE_AQUI_A_URL_DO_ZABBIX'
+      script: |
+        try {
+            var params = JSON.parse(value);
+
+            if (!params.teams_endpoint || params.teams_endpoint.indexOf('http') !== 0) {
+                throw 'Parametro teams_endpoint nao configurado';
+            }
+
+            var nsev = parseInt(params.event_nseverity, 10);
+            var color = 'Accent';
+            if (params.event_value === '0') {
+                color = 'Good';
+            }
+            else if (nsev >= 4) {
+                color = 'Attention';
+            }
+            else if (nsev === 3) {
+                color = 'Warning';
+            }
+
+            var body = [];
+            body.push({
+                type: 'TextBlock',
+                text: params.subject,
+                weight: 'Bolder',
+                size: 'Large',
+                wrap: true,
+                color: color
+            });
+
+            var lines = String(params.message).split('\n');
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i].replace(/^\s+|\s+$/g, '');
+                if (line === '') {
+                    continue;
+                }
+                body.push({type: 'TextBlock', text: line, wrap: true, spacing: 'Small'});
+            }
+
+            var content = {
+                '$schema': 'http://adaptivecards.io/schemas/adaptive-card.json',
+                type: 'AdaptiveCard',
+                version: '1.4',
+                body: body
+            };
+
+            if (params.zabbix_url && params.zabbix_url.indexOf('http') === 0 && params.event_id) {
+                content.actions = [{
+                    type: 'Action.OpenUrl',
+                    title: 'Abrir no Zabbix',
+                    url: params.zabbix_url.replace(/\/+$/, '') + '/tr_events.php?triggerid=' + params.trigger_id + '&eventid=' + params.event_id
+                }];
+            }
+
+            var card = {
+                type: 'message',
+                attachments: [{
+                    contentType: 'application/vnd.microsoft.card.adaptive',
+                    contentUrl: null,
+                    content: content
+                }]
+            };
+
+            var req = new HttpRequest();
+            req.addHeader('Content-Type: application/json');
+            if (params.http_proxy) {
+                req.setProxy(params.http_proxy);
+            }
+
+            var resp = req.post(params.teams_endpoint, JSON.stringify(card));
+            var status = req.getStatus();
+
+            if (status < 200 || status >= 300) {
+                throw 'Resposta HTTP ' + status + ': ' + resp;
+            }
+
+            return 'OK';
+        }
+        catch (error) {
+            Zabbix.log(3, '[NOC Teams] Falha no envio: ' + error);
+            throw 'Falha no envio para o Teams: ' + error;
+        }
+      timeout: 30s
+      description: 'Envia alertas do Zabbix para o Microsoft Teams (Workflows) em formato de cartão. NOC Sobradinho - BA.'
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '🚨 [{EVENT.SEVERITY}] {EVENT.NAME}'
+          message: |
+            Ambiente: NOC Sobradinho - BA
+            Host: {HOST.NAME}
+            Problema: {EVENT.NAME}
+            Severidade: {EVENT.SEVERITY}
+            Início: {EVENT.DATE} às {EVENT.TIME}
+            Dados operacionais: {EVENT.OPDATA}
+            ID do evento: {EVENT.ID}
+            Ação recomendada: verificar o equipamento e acionar a equipe responsável.
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: '✅ RESOLVIDO: {EVENT.NAME}'
+          message: |
+            Ambiente: NOC Sobradinho - BA
+            Host: {HOST.NAME}
+            Problema: {EVENT.NAME}
+            Severidade: {EVENT.SEVERITY}
+            Resolvido em: {EVENT.RECOVERY.DATE} às {EVENT.RECOVERY.TIME}
+            Duração: {EVENT.DURATION}
+            ID do evento: {EVENT.ID}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '🔄 Atualização: {EVENT.NAME}'
+          message: |
+            Host: {HOST.NAME}
+            Problema: {EVENT.NAME}
+            Atualizado por: {USER.FULLNAME}
+            Ação: {EVENT.UPDATE.ACTION}
+            Comentário: {EVENT.UPDATE.MESSAGE}
+            Status atual: {EVENT.STATUS} | Reconhecido: {EVENT.ACK.STATUS}
