@@ -17,15 +17,15 @@ Painel de monitoramento do parque de impressoras de uma operação com várias l
 
 | Visão Geral | TV - Impressoras |
 |---|---|
-| ![Visão Geral](docs/images/visao-geral.png) | ![TV](docs/images/tv-impressoras.png) |
+| ![Visão Geral](docs/images/Visão_Geral-DASH.png) | ![TV](docs/images/TV_Geral-DASH.png) |
 
 | Impressoras Monocromáticas | Impressoras Coloridas |
 |---|---|
-| ![Mono](docs/images/monocromaticas.png) | ![Coloridas](docs/images/coloridas.png) |
+| ![Mono](docs/images/MONO_Geral-DASH.png) | ![Coloridas](docs/images/COLOR_Geral-DASH.png) |
 
 | Alerta no Teams |
 |---|
-| ![Teams](docs/images/alerta-teams.png) |
+| ![Teams](docs/images/Monitoramento_Teams.png) |
 
 ---
 
