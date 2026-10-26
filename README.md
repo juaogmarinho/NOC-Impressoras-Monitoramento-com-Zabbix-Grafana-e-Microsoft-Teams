@@ -13,8 +13,6 @@ Painel de monitoramento do parque de impressoras de uma operação com várias l
 
 ## 📸 Capturas de tela
 
-> Use apenas imagens **anonimizadas** (sem IPs, números de série, nomes reais de equipamentos e marca d'água corporativa). Veja a seção [Segurança e privacidade](#-segurança-e-privacidade).
-
 | Visão Geral | TV - Impressoras |
 |---|---|
 | ![Visão Geral](docs/images/Visão_Geral-DASH.png) | ![TV](docs/images/TV_Geral-DASH.png) |
