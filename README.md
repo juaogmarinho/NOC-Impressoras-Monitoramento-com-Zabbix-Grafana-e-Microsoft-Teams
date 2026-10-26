@@ -204,7 +204,6 @@ secrets/
 - [ ] Painel **Suprimentos e Compras** (cartuchos a repor por cor).
 - [ ] **Previsão de fim de toner** com base no consumo dos últimos 30 dias.
 - [ ] Painel de **Disponibilidade e SLA** (30 dias).
-- [ ] Extensão para switches, servidores e links.
 - [ ] Alerta de ausência de dados do Zabbix.
 
 ---
@@ -215,9 +214,9 @@ Sugestões e melhorias são bem-vindas. Abra uma *issue* descrevendo o cenário 
 
 ## 📄 Licença
 
-Distribuído sob a licença MIT. Veja o arquivo `LICENSE` (adicione o seu antes de publicar).
+Distribuído sob a licença MIT.
 
 ## 👤 Autor
 
 **João Silva** · Infraestrutura de TI
-Conecte-se no LinkedIn: _[adicione o link do seu perfil]_
+Conecte-se no LinkedIn: www.linkedin.com/in/juaomarinho
